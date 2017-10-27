@@ -16,10 +16,10 @@
 #define RIGHT_SHUTDOWN_ADDRESS 0x32
 #define TOP_SHUTDOWN_ADDRESS 0x33
 
-#define MOTOR_LEFT_CH0 2
-#define MOTOR_LEFT_CH1 3
-#define MOTOR_RIGHT_CH0  4
-#define MOTOR_RIGHT_CH1  5
+#define MOTOR_LEFT_CH0 4
+#define MOTOR_LEFT_CH1 5
+#define MOTOR_RIGHT_CH0  2
+#define MOTOR_RIGHT_CH1  3
 
 #define SERVO_PIN 9
 
@@ -74,6 +74,9 @@ void loop() {
         statusCode = 500;
         newByte = 'c';
         break;
+      case 'y':
+        statusCode = 104;
+        newByte = 'c';
     }
     newByte = 'c';
   } 
@@ -97,8 +100,14 @@ void loop() {
       myMotor.stopMotors();
       break;
     case 103:
+      myMotor.turnLeft();
+      myMotor.stopMotors();
+      statusCode = 100;
       break;
     case 104:
+      myMotor.turnRight();
+      myMotor.stopMotors();
+      statusCode = 100;
       break;
     case 105:
       break;

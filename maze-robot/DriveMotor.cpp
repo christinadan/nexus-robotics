@@ -1,12 +1,15 @@
 #include "DriveMotor.h"
 
-#define Kp 0.25
-#define Kd 0.25
+#define Kp 0.30
+#define Kd 0.30
 #define rightMaxSpeed 250
 #define leftMaxSpeed 250
 #define rightBaseSpeed 125
 #define leftBaseSpeed 125
 #define setDist 146.05
+#define turnDelay 500
+#define clearDelay 1000
+#define wheelModifier 40
 
 DriveMotor::DriveMotor(const byte lm0, const byte lm1, const byte rm0, const byte rm1) {
   leftMotorCh0Pin = lm0;
@@ -49,3 +52,36 @@ void DriveMotor::stopMotors() {
   analogWrite(rightMotorCh0Pin, 0);
   analogWrite(rightMotorCh1Pin, 0);
 }
+
+void DriveMotor::turnRight() {
+  analogWrite(leftMotorCh0Pin, leftBaseSpeed);
+  analogWrite(leftMotorCh1Pin, 0);
+
+  analogWrite(rightMotorCh0Pin, 0);
+  analogWrite(rightMotorCh1Pin, rightBaseSpeed);
+  delay(turnDelay);
+  
+  analogWrite(leftMotorCh0Pin, leftBaseSpeed + wheelModifier);
+  analogWrite(leftMotorCh1Pin, 0);
+
+  analogWrite(rightMotorCh0Pin, rightBaseSpeed);
+  analogWrite(rightMotorCh1Pin, 0);
+  delay(clearDelay);
+}
+
+void DriveMotor::turnLeft() {
+  analogWrite(leftMotorCh0Pin, 0);
+  analogWrite(leftMotorCh1Pin, leftBaseSpeed);
+
+  analogWrite(rightMotorCh0Pin, rightBaseSpeed);
+  analogWrite(rightMotorCh1Pin, 0);
+  delay(turnDelay);
+
+  analogWrite(leftMotorCh0Pin, leftBaseSpeed);
+  analogWrite(leftMotorCh1Pin, 0);
+
+  analogWrite(rightMotorCh0Pin, rightBaseSpeed + 100);
+  analogWrite(rightMotorCh1Pin, 0);
+  delay(clearDelay);
+}
+
