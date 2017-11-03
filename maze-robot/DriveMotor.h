@@ -18,6 +18,11 @@ class DriveMotor {
     void stopMotors();
     void turnLeft();
     void turnRight();
+    void turnAround();
+    void turnPositioning(const int delayTime);
+    void adjustAfterLeftTurn();
+    void adjustWideLeftTurn(const int leftDistance);
 };
 
 #endif
+
