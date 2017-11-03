@@ -82,6 +82,10 @@ void loop() {
       case 'y':
         statusCode = 104;
         newByte = 'c';
+      case 'p':
+        statusCode = 205;
+        newByte = 'c';
+        break;
     }
     newByte = 'c';
   } 
@@ -119,6 +123,12 @@ void loop() {
       myMotor.stopMotors();
       myMotor.adjustAfterLeftTurn();
       myMotor.stopMotors();
+      
+      if (sensors.getLeftDistance() > sideDistTolerance) {
+        myMotor.adjustAfterLeftTurn();
+        myMotor.stopMotors();
+      }
+
 //      myMotor.adjustWideLeftTurn(leftDist);
 //      myMotor.stopMotors();
       delay(1000);
@@ -158,6 +168,10 @@ void loop() {
 //        statusCode = 105;
       }
       break;
+    case 205:
+      myMotor.driveForward();
+      delay(4000);
+      myMotor.stopMotors();
     case 300:
       break;
     case 301:

@@ -15,6 +15,7 @@ class DriveMotor {
   public:
     DriveMotor(const byte lm0, const byte lm1, const byte rm0, const byte rm1);
     int driveForward(const int leftDist, const int lastError);
+    void driveForward();
     void stopMotors();
     void turnLeft();
     void turnRight();
