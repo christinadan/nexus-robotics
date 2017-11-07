@@ -4,7 +4,7 @@
 #define Kd 0.25
 #define wheelModifier .85
 #define rightMaxSpeed 250
-#define leftMaxSpeed 250ssss
+#define leftMaxSpeed 250
 #define rightBaseSpeed 125
 #define leftBaseSpeed 125
 #define setDist 150
