@@ -13,7 +13,7 @@ class HitGong {
     
   public:
    HitGong(const byte sp);
-   void findAndHitGong();
+   void swingMallet();
 };
 
 #endif

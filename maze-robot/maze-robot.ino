@@ -29,6 +29,7 @@
 
 #define frontDistTolerance 200
 #define sideDistTolerance 250
+#define gongDistance 150
 
 DriveMotor myMotor(MOTOR_LEFT_CH0, MOTOR_LEFT_CH1,
                     MOTOR_RIGHT_CH0, MOTOR_RIGHT_CH1);
@@ -133,13 +134,13 @@ void loop() {
       myMotor.adjustAfterLeftTurn();
       myMotor.stopMotors();
       
-//      if (sensors.getLeftDistance() > sideDistTolerance) {
-//        myMotor.adjustAfterLeftTurn();
-//        myMotor.stopMotors();
-//      }
+      if (sensors.getLeftFrontDistance() > sideDistTolerance) {
+        myMotor.adjustAfterLeftTurn();
+        myMotor.stopMotors();
+      }
 
-//      myMotor.adjustWideLeftTurn(leftDist);
-//      myMotor.stopMotors();
+      myMotor.adjustWideLeftTurn(leftFrontDist);
+      myMotor.stopMotors();
       delay(1000);
       lastError = 0;
       statusCode = 100;
@@ -183,8 +184,14 @@ void loop() {
 //      myMotor.stopMotors();
         break;
     case 300:
+      if(frontDist < gongDistance) {
+        lastError = myMotor.driveForward(leftFrontDist, lastError);
+      } else {
+        statusCode = 301;
+      }
       break;
     case 301:
+      hitGong.swingMallet();
       break;
     case 400: // sensor diagnostics
       Serial3.println("starting sensor diagnostics");
