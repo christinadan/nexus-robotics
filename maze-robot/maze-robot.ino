@@ -43,6 +43,9 @@ int mazeEnd = false;
 int statusCode = 100;
 byte newByte = 'c';
 boolean isOkay = true;
+boolean boxFront = false;
+boolean boxLeft = true;
+boolean boxRight = true;
 
 void setup() {
   Wire.begin();
@@ -107,16 +110,22 @@ void loop() {
       if (frontDist < frontDistTolerance) {
         Serial3.println("front distance exceeding tolerance!!");
         Serial3.println(frontDist);
-         statusCode = 200;
-      } else if (leftFrontDist > sideDistTolerance || leftBackDist > sideDistTolerance) {
+        boxFront = true;
+        statusCode = 200;
+      } 
+      if (leftFrontDist > sideDistTolerance || leftBackDist > sideDistTolerance) {
         Serial3.println("left distance exceeding tolerance!!");
         Serial3.println(leftFrontDist);
+        boxLeft = false;
         statusCode = 200;
-      } else if (rightFrontDist > sideDistTolerance || rightBackDist > sideDistTolerance) {
+      } 
+      if (rightFrontDist > sideDistTolerance || rightBackDist > sideDistTolerance) {
         Serial3.println("right distance exceeding tolerance!!");
         Serial3.println(rightFrontDist);
+        boxRight = false;
         statusCode = 200;
-      } else {
+      } 
+      if (!boxFront && !boxLeft && !boxRight) {
         lastError = myMotor.driveForward(leftFrontDist, lastError);
       }
       break;
@@ -161,28 +170,37 @@ void loop() {
       lastError = myMotor.driveForward(leftFrontDist, lastError);
       statusCode = 100;
       break;
-    case 106:
-      break;
     case 200:
       myMotor.stopMotors();
-      if (leftFrontDist > sideDistTolerance) {
-        Serial3.println("turning left :D");
-        Serial3.println(leftFrontDist);
-        // We can turn left.
-        statusCode = 103; 
-      } else if (rightFrontDist > sideDistTolerance) {
-        // We can turn right.
+      if (boxFront && boxLeft && boxRight) {
+        Serial3.println("I'm stuck, turning around");
+        statusCode = 105;     
+      } else if (boxFront && boxLeft) {
+        Serial3.println("My only option is to turn right");
         statusCode = 104;
-      } else if (frontDist < frontDistTolerance) {
-        // We are stuck, turn around.
-//        statusCode = 105;
+      } else if (boxFront && boxRight) {
+        Serial3.println("My only option is to turn left");
+        statusCode = 103;
+      } else if (boxLeft && boxRight) {
+        Serial3.println("My only option is forward, continuing forward");
+        statusCode = 101;
+      } else if (boxFront) {
+        Serial3.println("Following left wall, turning left");
+        statusCode = 103;
+      } else if (boxLeft) {
+        Serial3.println("Following left wall, going forward");
+        statusCode = 101;
+      } else if (boxRight) {
+        Serial3.println("Following left wall, turning left");
+        statusCode = 103;
+      } else {
+        Serial3.println("Following left wall, turning left");
+        statusCode = 103;
       }
+      boxFront = false;
+      boxLeft = true;
+      boxRight = true;
       break;
-    case 205:
-//      myMotor.driveForward();
-//      delay(4000);
-//      myMotor.stopMotors();
-        break;
     case 300:
       if(frontDist < gongDistance) {
         lastError = myMotor.driveForward(leftFrontDist, lastError);
