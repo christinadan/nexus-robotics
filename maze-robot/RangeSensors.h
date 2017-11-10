@@ -9,24 +9,32 @@
 class RangeSensors {
   private:
     byte frontShutdownPin;
-    byte leftShutdownPin;
-    byte rightShutdownPin;
+    byte leftFrontShutdownPin;
+    byte leftBackShutdownPin;
+    byte rightFrontShutdownPin;
+    byte rightBackShutdownPin;
     byte topShutdownPin;
     byte frontShutdownAddress;
-    byte leftShutdownAddress;
-    byte rightShutdownAddress;
+    byte leftFrontShutdownAddress;
+    byte leftBackShutdownAddress;
+    byte rightFrontShutdownAddress;
+    byte rightBackShutdownAddress;
     byte topShutdownAddress;
     VL53L0X frontSensor;
-    VL53L0X leftSensor;
-    VL53L0X rightSensor;
+    VL53L0X leftFrontSensor;
+    VL53L0X leftBackSensor;
+    VL53L0X rightFrontSensor;
+    VL53L0X rightBackSensor;
     VL53L0X topSensor;
 
   public:
-    RangeSensors(const byte fsp, const byte lsp, const byte rsp, const byte tsp, const byte fsa, const byte lsa, const byte rsa, const byte tsa);
+    RangeSensors(const byte fsp, const byte lfsp, const byte lbsp, const byte rfsp, const byte rbsp, const byte tsp, const byte fsa, const byte lfsa, const byte lbsa, const byte rfsa, const byte rbsa, const byte tsa);
     int getTopDistance(void);
     int getFrontDistance(void);
-    int getLeftDistance(void);
-    int getRightDistance(void);
+    int getLeftFrontDistance(void);
+    int getLeftBackDistance(void);
+    int getRightFrontDistance(void);
+    int getRightBackDistance(void);
     void start(void);
     void init(void);
     void turnOff(void);
