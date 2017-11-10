@@ -38,6 +38,7 @@ RangeSensors sensors(FRONT_SHUTDOWN_PIN, LEFTFRONT_SHUTDOWN_PIN, LEFTBACK_SHUTDO
 
 HitGong hitGong(SERVO_PIN);
 
+// initialize variables
 int lastError = 0;
 int mazeEnd = false;
 int statusCode = 100;
@@ -51,20 +52,23 @@ void setup() {
   Wire.begin();
   // put your setup code here, to run once:
 
+  // initialize serial ports
   Serial.begin(9600);
   Serial3.begin(9600);
-  
+
+  // initialize sensors
   sensors.reset();
   sensors.turnOff();
   sensors.init();
   sensors.start();
 
-
+  // tell user that the robot is ready
   Serial3.println("system ready");
   delay(1000);
 }
 
 void loop() {
+  //ping all sensors
   int leftFrontDist = sensors.getLeftFrontDistance();
   int leftBackDist = sensors.getLeftBackDistance();
   int topDist = sensors.getTopDistance();
@@ -72,14 +76,17 @@ void loop() {
   int rightFrontDist = sensors.getRightFrontDistance();
   int rightBackDist = sensors.getRightBackDistance();
 
+  //check for new command
   if (Serial3.available() > 0) {
     newByte = Serial3.read();
     Serial3.println(newByte);
   }
 
+  //check for canopy
 //  if (topDist < 150 && topDist > 25) {
 //    
-//  } else 
+//  } else
+  //read new command
   if (newByte != 'c') {
     switch(newByte) {
       case 's':
@@ -91,7 +98,6 @@ void loop() {
         newByte = 'c';
         break;
       case 'y':
-        Serial3.println("statuscode 400");
         statusCode = 400;
         newByte = 'c';
         break;
@@ -104,9 +110,10 @@ void loop() {
   } 
 
   switch(statusCode) {
-    case 100:                         
+    case 100:     //Waiting for start command                         
       break;
-    case 101:
+    case 101:     //Drive forward
+      //check distances and set where the boxes are
       if (frontDist < frontDistTolerance) {
         Serial3.println("front distance exceeding tolerance!!");
         Serial3.println(frontDist);
@@ -125,14 +132,11 @@ void loop() {
         boxRight = false;
         statusCode = 200;
       } 
-      if (!boxFront && !boxLeft && !boxRight) {
-        lastError = myMotor.driveForward(leftFrontDist, lastError);
-      }
       break;
-    case 102:
+    case 102:     //stop driving
       myMotor.stopMotors();
       break;
-    case 103:
+    case 103:     //turn left
       Serial3.print("Last error ");
       Serial3.print(lastError);
       Serial3.println();
@@ -154,7 +158,7 @@ void loop() {
       lastError = 0;
       statusCode = 100;
       break;
-    case 104:
+    case 104:     //turn right
       Serial3.println(statusCode);
       myMotor.turnRight();
       myMotor.stopMotors();
@@ -162,7 +166,7 @@ void loop() {
       lastError = myMotor.driveForward(leftFrontDist, lastError);
       statusCode = 100;
       break;
-    case 105:
+    case 105:     //turn around
       Serial3.println(statusCode);
       myMotor.turnAround();
       myMotor.stopMotors();
@@ -170,8 +174,9 @@ void loop() {
       lastError = myMotor.driveForward(leftFrontDist, lastError);
       statusCode = 100;
       break;
-    case 200:
+    case 200:     //determine new direction
       myMotor.stopMotors();
+      //check where the boxes are
       if (boxFront && boxLeft && boxRight) {
         Serial3.println("I'm stuck, turning around");
         statusCode = 105;     
@@ -201,14 +206,14 @@ void loop() {
       boxLeft = true;
       boxRight = true;
       break;
-    case 300:
+    case 300:     //find gong
       if(frontDist < gongDistance) {
         lastError = myMotor.driveForward(leftFrontDist, lastError);
       } else {
         statusCode = 301;
       }
       break;
-    case 301:
+    case 301:     //hit gong
       hitGong.swingMallet();
       break;
     case 400: // sensor diagnostics
@@ -246,24 +251,11 @@ void loop() {
       statusCode = 100;
          
       break;
-    case 500:
+    case 500:     //kill
       myMotor.stopMotors();
       statusCode = 100;
-      break;
-      
+      break;    
   }
-//  switch(mazeEnd) {
-//    case false:
-//      if(topDist < 150 && topDist > 25) {
-//        myMotor.stopMotors();
-//        mazeEnd = true;
-//      } else {
-//        lastError = myMotor.driveForward(leftDist, lastError);    
-//      }
-//      break;
-//    case true:
-//      
-//      break;  
-//  }
+
 
 }
