@@ -1,4 +1,4 @@
-#include <Wire.h>
+ #include <Wire.h>
 #include <VL53L0X.h>
 #include <Servo.h>
 
@@ -7,17 +7,13 @@
 #include "HitGong.h"
 
 #define FRONT_SHUTDOWN_PIN 42
-#define LEFTFRONT_SHUTDOWN_PIN 43
-#define LEFTBACK_SHUTDOWN_PIN 45
-#define RIGHTFRONT_SHUTDOWN_PIN 40
-#define RIGHTBACK_SHUTDOWN_PIN 44
+#define LEFT_SHUTDOWN_PIN 43
+#define RIGHT_SHUTDOWN_PIN 44
 #define TOP_SHUTDOWN_PIN 47
 
 #define FRONT_SHUTDOWN_ADDRESS 0x30
-#define LEFTFRONT_SHUTDOWN_ADDRESS 0x31
-#define LEFTBACK_SHUTDOWN_ADDRESS 0x32
-#define RIGHTFRONT_SHUTDOWN_ADDRESS 0x33
-#define RIGHTBACK_SHUTDOWN_ADDRESS 0x34
+#define LEFT_SHUTDOWN_ADDRESS 0x31
+#define RIGHT_SHUTDOWN_ADDRESS 0x34
 #define TOP_SHUTDOWN_ADDRESS 0x35
 
 #define MOTOR_LEFT_CH0 4
@@ -34,7 +30,7 @@
 DriveMotor myMotor(MOTOR_LEFT_CH0, MOTOR_LEFT_CH1,
                     MOTOR_RIGHT_CH0, MOTOR_RIGHT_CH1);
 
-RangeSensors sensors(FRONT_SHUTDOWN_PIN, LEFTFRONT_SHUTDOWN_PIN, LEFTBACK_SHUTDOWN_PIN, RIGHTFRONT_SHUTDOWN_PIN, RIGHTBACK_SHUTDOWN_PIN, TOP_SHUTDOWN_PIN, FRONT_SHUTDOWN_ADDRESS, LEFTFRONT_SHUTDOWN_ADDRESS, LEFTBACK_SHUTDOWN_ADDRESS, RIGHTFRONT_SHUTDOWN_ADDRESS, RIGHTBACK_SHUTDOWN_ADDRESS, TOP_SHUTDOWN_ADDRESS);
+RangeSensors sensors(FRONT_SHUTDOWN_PIN, LEFT_SHUTDOWN_PIN, RIGHT_SHUTDOWN_PIN, TOP_SHUTDOWN_PIN, FRONT_SHUTDOWN_ADDRESS, LEFT_SHUTDOWN_ADDRESS, RIGHT_SHUTDOWN_ADDRESS, TOP_SHUTDOWN_ADDRESS);
 
 HitGong hitGong(SERVO_PIN);
 
@@ -69,12 +65,10 @@ void setup() {
 
 void loop() {
   //ping all sensors
-  int leftFrontDist = sensors.getLeftFrontDistance();
-  int leftBackDist = sensors.getLeftBackDistance();
+  int leftDist = sensors.getLeftDistance();
   int topDist = sensors.getTopDistance();
   int frontDist = sensors.getFrontDistance();
-  int rightFrontDist = sensors.getRightFrontDistance();
-  int rightBackDist = sensors.getRightBackDistance();
+  int rightDist = sensors.getRightDistance();
 
   //check for new command
   if (Serial3.available() > 0) {
@@ -120,15 +114,15 @@ void loop() {
         boxFront = true;
         statusCode = 200;
       } 
-      if (leftFrontDist > sideDistTolerance || leftBackDist > sideDistTolerance) {
+      if (leftDist > sideDistTolerance) {
         Serial3.println("left distance exceeding tolerance!!");
-        Serial3.println(leftFrontDist);
+        Serial3.println(leftDist);
         boxLeft = false;
         statusCode = 200;
       } 
-      if (rightFrontDist > sideDistTolerance || rightBackDist > sideDistTolerance) {
+      if (rightDist > sideDistTolerance) {
         Serial3.println("right distance exceeding tolerance!!");
-        Serial3.println(rightFrontDist);
+        Serial3.println(rightDist);
         boxRight = false;
         statusCode = 200;
       } 
@@ -147,12 +141,12 @@ void loop() {
       myMotor.adjustAfterLeftTurn();
       myMotor.stopMotors();
       
-      if (sensors.getLeftFrontDistance() > sideDistTolerance) {
+      if (sensors.getLeftDistance() > sideDistTolerance) {
         myMotor.adjustAfterLeftTurn();
         myMotor.stopMotors();
       }
 
-      myMotor.adjustWideLeftTurn(leftFrontDist);
+      myMotor.adjustWideLeftTurn(leftDist);
       myMotor.stopMotors();
       delay(1000);
       lastError = 0;
@@ -163,7 +157,7 @@ void loop() {
       myMotor.turnRight();
       myMotor.stopMotors();
       delay(2000);
-      lastError = myMotor.driveForward(leftFrontDist, lastError);
+      lastError = myMotor.driveForward(leftDist, lastError);
       statusCode = 100;
       break;
     case 105:     //turn around
@@ -171,7 +165,7 @@ void loop() {
       myMotor.turnAround();
       myMotor.stopMotors();
       delay(2000);
-      lastError = myMotor.driveForward(leftFrontDist, lastError);
+      lastError = myMotor.driveForward(leftDist, lastError);
       statusCode = 100;
       break;
     case 200:     //determine new direction
@@ -208,7 +202,7 @@ void loop() {
       break;
     case 300:     //find gong
       if(frontDist < gongDistance) {
-        lastError = myMotor.driveForward(leftFrontDist, lastError);
+        lastError = myMotor.driveForward(leftDist, lastError);
       } else {
         statusCode = 301;
       }
@@ -219,12 +213,8 @@ void loop() {
     case 400: // sensor diagnostics
       Serial3.println("starting sensor diagnostics");
       
-      if (leftFrontDist == -1){
+      if (leftDist == -1){
         Serial3.println("leftFront sensor is unresponsive");
-        isOkay = false;
-      }
-      if (leftBackDist == -1){
-        Serial3.println("leftBack sensor is unresponsive");
         isOkay = false;
       }
 //      if (topDist){
@@ -235,12 +225,8 @@ void loop() {
         Serial3.println("front sensor is unresponsive");
         isOkay = false;
       }
-      if (rightFrontDist == -1) {
+      if (rightDist == -1) {
         Serial3.println("rightFront sensor is unresponsive");
-        isOkay = false;
-      }
-      if (rightBackDist == -1) {
-        Serial3.println("rightBack sensor is unresponsive");
         isOkay = false;
       }
       if (isOkay) {
