@@ -8,13 +8,13 @@
 
 #define FRONT_SHUTDOWN_PIN 42
 #define LEFT_SHUTDOWN_PIN 43
-#define RIGHT_SHUTDOWN_PIN 44
-#define TOP_SHUTDOWN_PIN 47
+#define RIGHT_SHUTDOWN_PIN 40
+#define TOP_SHUTDOWN_PIN 45
 
 #define FRONT_SHUTDOWN_ADDRESS 0x30
 #define LEFT_SHUTDOWN_ADDRESS 0x31
-#define RIGHT_SHUTDOWN_ADDRESS 0x34
-#define TOP_SHUTDOWN_ADDRESS 0x35
+#define RIGHT_SHUTDOWN_ADDRESS 0x32
+#define TOP_SHUTDOWN_ADDRESS 0x33
 
 #define MOTOR_LEFT_CH0 4
 #define MOTOR_LEFT_CH1 5
@@ -78,7 +78,8 @@ void loop() {
 
   //check for canopy
 //  if (topDist < 150 && topDist > 25) {
-//    
+//    Serial3.println("IM GONNA WRECK IT");
+//    statusCode = 300;
 //  } else
   //read new command
   if (newByte != 'c') {
@@ -96,7 +97,7 @@ void loop() {
         newByte = 'c';
         break;
       case 'p':
-        statusCode = 205;
+        statusCode = 401;
         newByte = 'c';
         break;
     }
@@ -120,12 +121,12 @@ void loop() {
         boxLeft = false;
         statusCode = 200;
       } 
-      if (rightDist > sideDistTolerance) {
-        Serial3.println("right distance exceeding tolerance!!");
-        Serial3.println(rightDist);
-        boxRight = false;
-        statusCode = 200;
-      } 
+//      if (rightDist > sideDistTolerance) {
+//        Serial3.println("right distance exceeding tolerance!!");
+//        Serial3.println(rightDist);
+//        boxRight = false;
+//        statusCode = 200;
+//      } 
       break;
     case 102:     //stop driving
       myMotor.stopMotors();
@@ -217,10 +218,10 @@ void loop() {
         Serial3.println("leftFront sensor is unresponsive");
         isOkay = false;
       }
-//      if (topDist){
-//        Serial3.println("top sensor is unresponsive");
-//        isOkay = false;
-//      }
+      if (topDist){
+        Serial3.println("top sensor is unresponsive");
+        isOkay = false;
+      }
       if (frontDist == -1) {
         Serial3.println("front sensor is unresponsive");
         isOkay = false;
@@ -236,6 +237,28 @@ void loop() {
       Serial3.println("Diagnostics complete");
       statusCode = 100;
          
+      break;
+    case 401:
+      Serial3.println("front distance");
+      Serial3.println(frontDist);
+
+      Serial3.println("");
+
+      Serial3.println("left distance");
+      Serial3.println(leftDist);
+
+      Serial3.println("");
+
+      Serial3.println("right distance");
+      Serial3.println(rightDist);
+
+      Serial3.println("");
+
+      Serial3.println("top distance");
+      Serial3.println(topDist);
+
+      Serial3.println("");
+      statusCode = 100;
       break;
     case 500:     //kill
       myMotor.stopMotors();
